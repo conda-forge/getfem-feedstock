@@ -7,7 +7,7 @@ Package license: LGPL-3.0-or-later AND BSD-3-Clause
 
 Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/getfem-feedstock/blob/main/LICENSE.txt)
 
-Summary: GetFEM++ is a generic finite element C++ library with interfaces for Python, Matlab and Scilab.
+Summary: GetFEM is a generic finite element C++ library with interfaces for Python, Matlab and Scilab.
 
 Development: https://github.com/getfem-doc/getfem
 
