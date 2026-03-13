@@ -1,30 +1,31 @@
 {% set name = "getfem" %}
-{% set version = "5.4.2" %}
+{% set version = "5.4.4" %}
 
 package:
   name: {{ name }}
   version: {{ version }}
 
 source:
-  url: http://download-mirror.savannah.gnu.org/releases/{{ name }}/stable/{{ name }}-{{ version }}.tar.gz
-  sha256: 80b625d5892fe9959c3b316340f326e3ece4e98325eb0a81dd5b9ddae563b1d1
+  url: https://github.com/{{ name }}/{{ name }}/archive/refs/tags/v{{ name }}.tar.gz
+  sha256: d552106065afa15146efb5eb179cf0c69b17b170ce153444599d5cccf618f17c
 
 build:
   number: 7
-  # Remove 'win' from the skip list
-  skip: true  # [osx or (python_impl == 'pypy')]
+  skip: true  # [py>=311 or osx or (python_impl == 'pypy')]
 
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - {{ compiler('fortran') }}  # [not win]
+    - {{ stdlib("c") }}
     - cmake
     - ninja
     - make  # [unix]
   host:
     - libtool  # [unix]
     - python
+    - setuptools
     - numpy
     - scipy
     - qhull
