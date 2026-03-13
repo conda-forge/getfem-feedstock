@@ -1,26 +1,19 @@
-{% set name = "getfem" %}
-{% set version = "5.4.2" %}
-
-package:
-  name: {{ name }}
-  version: {{ version }}
-
-source:
-  url: http://download-mirror.savannah.gnu.org/releases/{{ name }}/stable/{{ name }}-{{ version }}.tar.gz
-  sha256: 80b625d5892fe9959c3b316340f326e3ece4e98325eb0a81dd5b9ddae563b1d1
-
 build:
-  number: 6
-  skip: true  # [win or osx or (python_impl == 'pypy')]
+  number: 7
+  # Remove 'win' from the skip list
+  skip: true  # [osx or (python_impl == 'pypy')]
 
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - {{ compiler('fortran') }}
+    # Add cmake and ninja for the Windows build
+    - cmake
+    - ninja
+    - make  # [unix]
   host:
-    - libtool
-    - make  
+    - libtool  # [unix]
     - python
     - numpy
     - scipy
@@ -34,28 +27,3 @@ requirements:
     - mumps-seq
     - libopenblas
     - python
-
-test:
-  imports:
-    - getfem
-
-about:
-  home: https://getfem.org/
-  license: LGPL-3.0-or-later AND BSD-3-Clause
-  license_family: LGPL
-  license_file: 
-    - COPYING
-    - dep-licenses/
-  summary: 'GetFEM++ is a generic finite element C++ library with interfaces for Python, Matlab and Scilab.'
-  description: |
-    The GetFEM project focuses on the development of a generic and efficient C++ library for finite element methods elementary computations.
-  doc_url: https://getfem.readthedocs.io
-  dev_url: https://github.com/getfem-doc/getfem
-
-extra:
-  recipe-maintainers:
-    - logari81
-    - yvesrenard
-    - tkoyama010
-    - daviddanan
-    - ldallolio
