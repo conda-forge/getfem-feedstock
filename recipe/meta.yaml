@@ -18,8 +18,7 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - {{ compiler('fortran') }}
-    # Add cmake and ninja for the Windows build
+    - {{ compiler('fortran') }}  # [not win]
     - cmake
     - ninja
     - make  # [unix]
