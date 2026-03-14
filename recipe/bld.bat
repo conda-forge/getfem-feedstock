@@ -1,48 +1,39 @@
-:: Removed @echo off so we can see exactly what Windows is doing
+#!/usr/bin/env bash
+set -ex
 
-setlocal EnableDelayedExpansion
+echo "**************** G E T F E M  B U I L D  S T A R T S  H E R E ****************"
 
-echo "Building GetFEM with CMake..."
-FOR /F "delims=" %%i IN ('python -c "import numpy; print(numpy.get_include())"') DO set "NUMPY_INC=%%i"
+export CFLAGS="$CFLAGS -Wno-error=incompatible-pointer-types"
+export CXXFLAGS="$CXXFLAGS -Wno-error=incompatible-pointer-types"
 
-:: Build the CMake command safely, appending line-by-line to avoid ALL caret (^) bugs
-:: We include %CMAKE_ARGS% here right at the beginning
-set "CMAKE_CMD=cmake -B build -G Ninja %CMAKE_ARGS%"
-set "CMAKE_CMD=%CMAKE_CMD% -DCMAKE_BUILD_TYPE=Release"
-set "CMAKE_CMD=%CMAKE_CMD% -DCMAKE_INSTALL_PREFIX="%LIBRARY_PREFIX%""
-set "CMAKE_CMD=%CMAKE_CMD% -DCMAKE_PREFIX_PATH="%LIBRARY_PREFIX%""
-set "CMAKE_CMD=%CMAKE_CMD% -DENABLE_PYTHON=ON"
-set "CMAKE_CMD=%CMAKE_CMD% -DBUILD_SHARED_LIBS=ON"
-set "CMAKE_CMD=%CMAKE_CMD% -DGENERATE_GETFEM_IM_LIST_H=OFF"
-set "CMAKE_CMD=%CMAKE_CMD% -DENABLE_FORCE_SINGLETHREAD_BLAS:BOOL=OFF"
-set "CMAKE_CMD=%CMAKE_CMD% -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
-set "CMAKE_CMD=%CMAKE_CMD% -DMUMPS_INC_DIR="%LIBRARY_INC%""
-set "CMAKE_CMD=%CMAKE_CMD% -DSMUMPS_LIB="%LIBRARY_LIB%\smumps_seq.lib""
-set "CMAKE_CMD=%CMAKE_CMD% -DDMUMPS_LIB="%LIBRARY_LIB%\dmumps_seq.lib""
-set "CMAKE_CMD=%CMAKE_CMD% -DCMUMPS_LIB="%LIBRARY_LIB%\cmumps_seq.lib""
-set "CMAKE_CMD=%CMAKE_CMD% -DZMUMPS_LIB="%LIBRARY_LIB%\zmumps_seq.lib""
-set "CMAKE_CMD=%CMAKE_CMD% -DMUMPS_COMMON_LIB="%LIBRARY_LIB%\mumps_common_seq.lib""
-set "CMAKE_CMD=%CMAKE_CMD% -DPORD_LIB="%LIBRARY_LIB%\pord_seq.lib""
-set "CMAKE_CMD=%CMAKE_CMD% -DMPISEQ_LIB="%LIBRARY_LIB%\mpiseq_seq.lib""
-set "CMAKE_CMD=%CMAKE_CMD% -DPython3_EXECUTABLE="%PYTHON%""
-set "CMAKE_CMD=%CMAKE_CMD% -DPython3_NumPy_INCLUDE_DIRS="%NUMPY_INC%""
-set "CMAKE_CMD=%CMAKE_CMD% -DBLAS_LIBRARIES="%LIBRARY_LIB%\openblas.lib""
-set "CMAKE_CMD=%CMAKE_CMD% -DLAPACK_LIBRARIES="%LIBRARY_LIB%\openblas.lib""
+if [[ "$target_platform" == osx-* ]]; then
+  EXT=".dylib"
+else
+  EXT=".so"
+fi
 
-:: Print the exact command to the CI logs for debugging
-echo.
-echo ==============================================================================
-echo EXACT CMAKE COMMAND:
-echo %CMAKE_CMD%
-echo ==============================================================================
-echo.
+NUMPY_INC=$($PYTHON -c "import numpy; print(numpy.get_include())")
 
-:: Execute the command
-%CMAKE_CMD%
-if errorlevel 1 exit 1
+cmake -B build \
+    -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+    -DCMAKE_PREFIX_PATH="$PREFIX" \
+    -DENABLE_PYTHON=ON \
+    -DBUILD_SHARED_LIBS=ON \
+    -DGENERATE_GETFEM_IM_LIST_H=OFF \
+    -DMUMPS_INC_DIR="$PREFIX/include" \
+    -DSMUMPS_LIB="$PREFIX/lib/libsmumps_seq${EXT}" \
+    -DDMUMPS_LIB="$PREFIX/lib/libdmumps_seq${EXT}" \
+    -DCMUMPS_LIB="$PREFIX/lib/libcmumps_seq${EXT}" \
+    -DZMUMPS_LIB="$PREFIX/lib/libzmumps_seq${EXT}" \
+    -DMUMPS_COMMON_LIB="$PREFIX/lib/libmumps_common_seq${EXT}" \
+    -DPORD_LIB="$PREFIX/lib/libpord_seq${EXT}" \
+    -DMPISEQ_LIB="$PREFIX/lib/libmpiseq_seq${EXT}" \
+    -DPython3_EXECUTABLE="$PYTHON" \
+    -DPython3_NumPy_INCLUDE_DIRS="$NUMPY_INC"
 
 cmake --build build
-if errorlevel 1 exit 1
-
 cmake --install build
-if errorlevel 1 exit 1
+
+echo "**************** G E T F E M  B U I L D  E N D S  H E R E ****************"

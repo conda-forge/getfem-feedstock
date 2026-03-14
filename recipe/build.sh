@@ -16,6 +16,7 @@ NUMPY_INC=$($PYTHON -c "import numpy; print(numpy.get_include())")
 
 cmake -B build \
     -G Ninja \
+    ${CMAKE_ARGS} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="$PREFIX" \
     -DCMAKE_PREFIX_PATH="$PREFIX" \
