@@ -1,14 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-echo "Patching CMakeLists.txt to fix syntax and bypass POSIX dl check..."
-echo import io > fix.py
-echo t = io.open('CMakeLists.txt', encoding='utf-8').read() >> fix.py
-echo t = t.replace('(default: 14))', '(default: 14)' + chr(34) + ')') >> fix.py
-echo t = t.replace('if(ENABLE_FORCE_SINGLETHREAD_BLAS)', 'if(FALSE)') >> fix.py
-echo io.open('CMakeLists.txt', 'w', encoding='utf-8').write(t) >> fix.py
-python fix.py
-
 echo "Building GetFEM with CMake..."
 FOR /F "delims=" %%i IN ('python -c "import numpy; print(numpy.get_include())"') DO set "NUMPY_INC=%%i"
 

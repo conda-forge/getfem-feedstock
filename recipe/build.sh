@@ -6,15 +6,6 @@ echo "**************** G E T F E M  B U I L D  S T A R T S  H E R E ************
 export CFLAGS="$CFLAGS -Wno-error=incompatible-pointer-types"
 export CXXFLAGS="$CXXFLAGS -Wno-error=incompatible-pointer-types"
 
-# Safely create and run a python script to fix the upstream CMakeLists.txt syntax error
-cat << 'EOF' > fix.py
-import io
-t = io.open('CMakeLists.txt', encoding='utf-8').read()
-t = t.replace('(default: 14))', '(default: 14)' + chr(34) + ')')
-io.open('CMakeLists.txt', 'w', encoding='utf-8').write(t)
-EOF
-python fix.py
-
 if [[ "$target_platform" == osx-* ]]; then
   EXT=".dylib"
 else
