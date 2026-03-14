@@ -6,14 +6,14 @@ echo "**************** G E T F E M  B U I L D  S T A R T S  H E R E ************
 export CFLAGS="$CFLAGS -Wno-error=incompatible-pointer-types"
 export CXXFLAGS="$CXXFLAGS -Wno-error=incompatible-pointer-types"
 
+# Fix upstream CMakeLists.txt syntax error (missing quote)
+python -c "import io; text = io.open('CMakeLists.txt', encoding='utf-8').read(); text = text.replace('\"Set C++ standard version (default: 14))', '\"Set C++ standard version (default: 14)\"'); io.open('CMakeLists.txt', 'w', encoding='utf-8').write(text)"
+
 if [[ "$target_platform" == osx-* ]]; then
   EXT=".dylib"
 else
   EXT=".so"
 fi
-
-# Configure with CMake
-# Note: Added explicit paths for Python3_EXECUTABLE and Python3_NumPy_INCLUDE_DIRS
 
 NUMPY_INC=$($PYTHON -c "import numpy; print(numpy.get_include())")
 
