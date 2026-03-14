@@ -16,13 +16,7 @@ cmake -B build ^
   -DENABLE_MULTITHREADED_BLAS=ON ^
   -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON ^
   -DMUMPS_INC_DIR="%LIBRARY_INC%" ^
-  -DSMUMPS_LIB="%LIBRARY_LIB%\smumps_seq.lib" ^
-  -DDMUMPS_LIB="%LIBRARY_LIB%\dmumps_seq.lib" ^
-  -DCMUMPS_LIB="%LIBRARY_LIB%\cmumps_seq.lib" ^
-  -DZMUMPS_LIB="%LIBRARY_LIB%\zmumps_seq.lib" ^
-  -DMUMPS_COMMON_LIB="%LIBRARY_LIB%\mumps_common_seq.lib" ^
-  -DPORD_LIB="%LIBRARY_LIB%\pord_seq.lib" ^
-  -DMPISEQ_LIB="%LIBRARY_LIB%\mpiseq_seq.lib" ^
+  -DMUMPS_LIB_DIR="%LIBRARY_LIB%" ^
   -DPython3_EXECUTABLE="%PYTHON%" ^
   -DPython3_NumPy_INCLUDE_DIRS="%NUMPY_INC%" ^
   -DBLAS_LIBRARIES="%LIBRARY_LIB%\openblas.lib" ^
