@@ -41,6 +41,13 @@ Current build status
                 </a>
               </td>
             </tr><tr>
+              <td>osx_64_python3.10.____cpython</td>
+              <td>
+                <a href="https://dev.azure.com/conda-forge/feedstock-builds/_build/latest?definitionId=17198&branchName=main">
+                  <img src="https://dev.azure.com/conda-forge/feedstock-builds/_apis/build/status/getfem-feedstock?branchName=main&jobName=osx&configuration=osx%20osx_64_python3.10.____cpython" alt="variant">
+                </a>
+              </td>
+            </tr><tr>
               <td>win_64_python3.10.____cpython</td>
               <td>
                 <a href="https://dev.azure.com/conda-forge/feedstock-builds/_build/latest?definitionId=17198&branchName=main">
@@ -179,7 +186,6 @@ Feedstock Maintainers
 * [@daviddanan](https://github.com/daviddanan/)
 * [@ldallolio](https://github.com/ldallolio/)
 * [@logari81](https://github.com/logari81/)
-* [@python](https://github.com/python/)
 * [@tkoyama010](https://github.com/tkoyama010/)
 * [@yvesrenard](https://github.com/yvesrenard/)
 
