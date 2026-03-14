@@ -44,6 +44,15 @@ requirements:
 test:
   imports:
     - getfem
+  commands:
+    # 1. Verify standard Python module execution
+    - |
+      python -c "import getfem; print(f'GetFEM imported successfully from: {getfem.__file__}')"
+    
+    # 2. Cross the C++ boundary by instantiating a core GetFEM object.
+    # This physically forces the OS to load _getfem.pyd and all its linked DLLs (MUMPS, OpenBLAS, etc.)
+    - |
+      python -c "import getfem; m = getfem.Mesh('empty', 2); print('GetFEM C++ extension loaded and executed successfully.')"
 
 about:
   home: https://getfem.org/
