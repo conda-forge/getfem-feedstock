@@ -3,10 +3,6 @@ setlocal EnableDelayedExpansion
 
 echo "Building GetFEM with CMake..."
 
-:: Map the developer's CMake command to Conda-Forge environment variables.
-:: We drop the Intel-specific MKL flags (-DBLA_VENDOR) since you use libopenblas.
-:: We use %LIBRARY_PREFIX% which is Conda's equivalent to C:\opt.
-
 cmake -B build ^
   -G Ninja ^
   -DCMAKE_BUILD_TYPE=Release ^
@@ -17,15 +13,19 @@ cmake -B build ^
   -DGENERATE_GETFEM_IM_LIST_H=OFF ^
   -DENABLE_FORCE_SINGLETHREAD_BLAS=OFF ^
   -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON ^
-  -DMUMPS_LIB_DIR="%LIBRARY_LIB%" ^
-  -DMUMPS_INC_DIR="%LIBRARY_INC%"
+  -DMUMPS_INC_DIR="%LIBRARY_INC%" ^
+  -DSMUMPS_LIB="%LIBRARY_LIB%\smumps_seq.lib" ^
+  -DDMUMPS_LIB="%LIBRARY_LIB%\dmumps_seq.lib" ^
+  -DCMUMPS_LIB="%LIBRARY_LIB%\cmumps_seq.lib" ^
+  -DZMUMPS_LIB="%LIBRARY_LIB%\zmumps_seq.lib" ^
+  -DMUMPS_COMMON_LIB="%LIBRARY_LIB%\mumps_common_seq.lib" ^
+  -DPORD_LIB="%LIBRARY_LIB%\pord_seq.lib" ^
+  -DMPISEQ_LIB="%LIBRARY_LIB%\mpiseq_seq.lib"
 
 if errorlevel 1 exit 1
 
-:: Build
 cmake --build build
 if errorlevel 1 exit 1
 
-:: Install
 cmake --install build
 if errorlevel 1 exit 1

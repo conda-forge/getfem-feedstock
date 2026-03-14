@@ -21,9 +21,7 @@ requirements:
     - {{ stdlib("c") }}
     - cmake
     - ninja
-    - make  # [unix]
   host:
-    - libtool  # [unix]
     - python
     - setuptools
     - numpy
