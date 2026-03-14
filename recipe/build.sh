@@ -3,11 +3,9 @@ set -ex
 
 echo "**************** G E T F E M  B U I L D  S T A R T S  H E R E ****************"
 
-# Downgrade the strict GCC 14 pointer error to a warning just in case
 export CFLAGS="$CFLAGS -Wno-error=incompatible-pointer-types"
 export CXXFLAGS="$CXXFLAGS -Wno-error=incompatible-pointer-types"
 
-# Future-proofing for macOS: Set the correct shared library extension
 if [[ "$target_platform" == osx-* ]]; then
   EXT=".dylib"
 else
@@ -15,7 +13,10 @@ else
 fi
 
 # Configure with CMake
-# Explicitly map the MUMPS sequential libraries to bypass the missing _seq suffixes
+# Note: Added explicit paths for Python3_EXECUTABLE and Python3_NumPy_INCLUDE_DIRS
+
+NUMPY_INC=$($PYTHON -c "import numpy; print(numpy.get_include())")
+
 cmake -B build \
     -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
@@ -31,9 +32,10 @@ cmake -B build \
     -DZMUMPS_LIB="$PREFIX/lib/libzmumps_seq${EXT}" \
     -DMUMPS_COMMON_LIB="$PREFIX/lib/libmumps_common_seq${EXT}" \
     -DPORD_LIB="$PREFIX/lib/libpord_seq${EXT}" \
-    -DMPISEQ_LIB="$PREFIX/lib/libmpiseq_seq${EXT}"
+    -DMPISEQ_LIB="$PREFIX/lib/libmpiseq_seq${EXT}" \
+    -DPython3_EXECUTABLE="$PYTHON" \
+    -DPython3_NumPy_INCLUDE_DIRS="$NUMPY_INC"
 
-# Build and install
 cmake --build build
 cmake --install build
 

@@ -3,6 +3,9 @@ setlocal EnableDelayedExpansion
 
 echo "Building GetFEM with CMake..."
 
+:: Dynamically ask Python for the exact NumPy include directory
+FOR /F "delims=" %%i IN ('"%PYTHON%" -c "import numpy; print(numpy.get_include())"') DO set "NUMPY_INC=%%i"
+
 cmake -B build ^
   -G Ninja ^
   -DCMAKE_BUILD_TYPE=Release ^
@@ -20,7 +23,9 @@ cmake -B build ^
   -DZMUMPS_LIB="%LIBRARY_LIB%\zmumps_seq.lib" ^
   -DMUMPS_COMMON_LIB="%LIBRARY_LIB%\mumps_common_seq.lib" ^
   -DPORD_LIB="%LIBRARY_LIB%\pord_seq.lib" ^
-  -DMPISEQ_LIB="%LIBRARY_LIB%\mpiseq_seq.lib"
+  -DMPISEQ_LIB="%LIBRARY_LIB%\mpiseq_seq.lib" ^
+  -DPython3_EXECUTABLE="%PYTHON%" ^
+  -DPython3_NumPy_INCLUDE_DIRS="%NUMPY_INC%"
 
 if errorlevel 1 exit 1
 
