@@ -8,10 +8,12 @@ package:
 source:
   url: https://github.com/{{ name }}/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
   sha256: d552106065afa15146efb5eb179cf0c69b17b170ce153444599d5cccf618f17c
+  patches:
+    - fix-cmake-syntax.patch
 
 build:
   number: 0
-  skip: true  # [py>=311 or not win or (python_impl == 'pypy')]
+  skip: true  # [py>=311 or (python_impl == 'pypy')]
 
 requirements:
   build:
