@@ -2,7 +2,7 @@
 setlocal EnableDelayedExpansion
 
 echo "Patching CMakeLists.txt to fix syntax and bypass POSIX dl check..."
-python -c "import io; text = io.open('CMakeLists.txt', encoding='utf-8').read(); text = text.replace('\"Set C++ standard version (default: 14))', '\"Set C++ standard version (default: 14)\"').replace('if(ENABLE_FORCE_SINGLETHREAD_BLAS)', 'if(FALSE)'); io.open('CMakeLists.txt', 'w', encoding='utf-8').write(text)"
+python -c "import io; text = io.open('CMakeLists.txt', encoding='utf-8').read(); text = text.replace('\"Set C++ standard version (default: 14))', '\"Set C++ standard version (default: 14)\")').replace('if(ENABLE_FORCE_SINGLETHREAD_BLAS)', 'if(FALSE)'); io.open('CMakeLists.txt', 'w', encoding='utf-8').write(text)"
 
 echo "Building GetFEM with CMake..."
 FOR /F "delims=" %%i IN ('python -c "import numpy; print(numpy.get_include())"') DO set "NUMPY_INC=%%i"
