@@ -58,7 +58,8 @@ cmake -B build ^
   -DMUMPS_INC_DIR="%LIBRARY_INC%" ^
   -DPython3_EXECUTABLE="%PYTHON%" ^
   -DPython3_NumPy_INCLUDE_DIRS="%NUMPY_INC%" ^
-  -DPYTHON_SITE_PACKAGES="%SP_DIR_FWD%"
+  -DPython3_SITELIB="%SP_DIR_FWD%" ^
+  -DPython3_SITEARCH="%SP_DIR_FWD%"
 
 if errorlevel 1 exit 1
 
