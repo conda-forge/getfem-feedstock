@@ -10,13 +10,13 @@ source:
   sha256: d552106065afa15146efb5eb179cf0c69b17b170ce153444599d5cccf618f17c
 
 build:
-  number: 0
+  number: 1
 
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - {{ compiler('fortran') }}  # [not win]
+    - {{ compiler("fortran") }}
     - {{ stdlib("c") }}
     - cmake
     - ninja
@@ -43,7 +43,7 @@ test:
     # 1. Verify standard Python module execution
     - |
       python -c "import getfem; print(f'GetFEM imported successfully from: {getfem.__file__}')"
-    
+
     # 2. Cross the C++ boundary by instantiating a core GetFEM object.
     # This physically forces the OS to load _getfem.pyd and all its linked DLLs (MUMPS, OpenBLAS, etc.)
     - |
@@ -53,7 +53,7 @@ about:
   home: https://getfem.org/
   license: LGPL-3.0-or-later AND BSD-3-Clause
   license_family: LGPL
-  license_file: 
+  license_file:
     - COPYING
     - dep-licenses/
   summary: 'GetFEM++ is a generic finite element C++ library with interfaces for Python, Matlab and Scilab.'
