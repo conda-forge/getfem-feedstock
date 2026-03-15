@@ -1,22 +1,20 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-echo "Dynamically finding MUMPS and OpenBLAS libraries..."
+echo "Dynamically finding MUMPS libraries and patching CMakeLists.txt..."
 echo import io, os, glob > patch_mumps.py
 echo lib_dir = os.environ.get("LIBRARY_LIB", "") >> patch_mumps.py
 echo libs = [] >> patch_mumps.py
 echo for p in ["*smumps*.lib", "*dmumps*.lib", "*cmumps*.lib", "*zmumps*.lib", "*mumps_common*.lib", "*pord*.lib", "*mpiseq*.lib"]: >> patch_mumps.py
 echo     matches = glob.glob(os.path.join(lib_dir, p)) >> patch_mumps.py
 echo     if matches: libs.append(matches[0].replace(chr(92), chr(47))) >> patch_mumps.py
+echo     print("Pattern", p, "found:", matches) >> patch_mumps.py
 echo text = io.open("CMakeLists.txt", encoding="utf-8").read() >> patch_mumps.py
 echo text = text.replace("set(MUMPS_LIBS " + chr(34) + chr(34) + ")", "set(MUMPS_LIBS " + chr(34) + ";".join(libs) + chr(34) + ")") >> patch_mumps.py
 echo io.open("CMakeLists.txt", "w", encoding="utf-8").write(text) >> patch_mumps.py
-echo ob_matches = glob.glob(os.path.join(lib_dir, "*openblas*.lib")) >> patch_mumps.py
-echo if ob_matches: print(ob_matches[0].replace(chr(92), chr(47))) >> patch_mumps.py
 python patch_mumps.py
 
 FOR /F "delims=" %%i IN ('python -c "import numpy; print(numpy.get_include())"') DO set "NUMPY_INC=%%i"
-FOR /F "delims=" %%i IN ('python patch_mumps.py') DO set "OPENBLAS_LIB=%%i"
 
 echo "Building GetFEM with CMake..."
 
@@ -34,8 +32,7 @@ cmake -B build ^
   -DMUMPS_INC_DIR="%LIBRARY_INC%" ^
   -DPython3_EXECUTABLE="%PYTHON%" ^
   -DPython3_NumPy_INCLUDE_DIRS="%NUMPY_INC%" ^
-  -DBLAS_LIBRARIES="%OPENBLAS_LIB%" ^
-  -DLAPACK_LIBRARIES="%OPENBLAS_LIB%"
+  -DBLA_VENDOR=OpenBLAS
 
 if errorlevel 1 exit 1
 
