@@ -1,32 +1,33 @@
 {% set name = "getfem" %}
-{% set version = "5.4.2" %}
+{% set version = "5.4.4" %}
 
 package:
   name: {{ name }}
   version: {{ version }}
 
 source:
-  url: http://download-mirror.savannah.gnu.org/releases/{{ name }}/stable/{{ name }}-{{ version }}.tar.gz
-  sha256: 80b625d5892fe9959c3b316340f326e3ece4e98325eb0a81dd5b9ddae563b1d1
+  url: https://github.com/{{ name }}/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
+  sha256: d552106065afa15146efb5eb179cf0c69b17b170ce153444599d5cccf618f17c
 
 build:
-  number: 6
-  skip: true  # [win or osx or (python_impl == 'pypy')]
+  number: 0
 
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - {{ compiler('fortran') }}
+    - {{ compiler('fortran') }}  # [not win]
+    - {{ stdlib("c") }}
+    - cmake
+    - ninja
   host:
-    - libtool
-    - make  
     - python
+    - setuptools
     - numpy
     - scipy
     - qhull
     - mumps-seq
-    - libopenblas
+    - openblas
   run:
     - numpy
     - scipy
@@ -38,6 +39,15 @@ requirements:
 test:
   imports:
     - getfem
+  commands:
+    # 1. Verify standard Python module execution
+    - |
+      python -c "import getfem; print(f'GetFEM imported successfully from: {getfem.__file__}')"
+    
+    # 2. Cross the C++ boundary by instantiating a core GetFEM object.
+    # This physically forces the OS to load _getfem.pyd and all its linked DLLs (MUMPS, OpenBLAS, etc.)
+    - |
+      python -c "import getfem; m = getfem.Mesh('empty', 2); print('GetFEM C++ extension loaded and executed successfully.')"
 
 about:
   home: https://getfem.org/
