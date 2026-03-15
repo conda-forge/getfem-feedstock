@@ -28,7 +28,7 @@ requirements:
     - scipy
     - qhull
     - mumps-seq
-    - libopenblas
+    - openblas
   run:
     - numpy
     - scipy
