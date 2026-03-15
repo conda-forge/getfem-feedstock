@@ -2,17 +2,19 @@
 setlocal EnableDelayedExpansion
 
 echo "Dynamically finding MUMPS libraries and patching CMakeLists.txt..."
-echo import io, os, glob > patch_mumps.py
-echo lib_dir = os.environ.get("LIBRARY_LIB", "") >> patch_mumps.py
-echo libs = [] >> patch_mumps.py
-echo for p in ["*smumps*.lib", "*dmumps*.lib", "*cmumps*.lib", "*zmumps*.lib", "*mumps_common*.lib", "*pord*.lib", "*mpiseq*.lib"]: >> patch_mumps.py
-echo     matches = glob.glob(os.path.join(lib_dir, p)) >> patch_mumps.py
-echo     if matches: libs.append(matches[0].replace(chr(92), chr(47))) >> patch_mumps.py
-echo     print("Pattern", p, "found:", matches) >> patch_mumps.py
-echo text = io.open("CMakeLists.txt", encoding="utf-8").read() >> patch_mumps.py
-echo text = text.replace("set(MUMPS_LIBS " + chr(34) + chr(34) + ")", "set(MUMPS_LIBS " + chr(34) + ";".join(libs) + chr(34) + ")") >> patch_mumps.py
-echo io.open("CMakeLists.txt", "w", encoding="utf-8").write(text) >> patch_mumps.py
-python patch_mumps.py
+echo import io, os, glob > patch_cmake.py
+echo lib_dir = os.environ.get("LIBRARY_LIB", "") >> patch_cmake.py
+echo ob_path = os.path.join(lib_dir, "openblas.lib").replace(chr(92), chr(47)) >> patch_cmake.py
+echo libs = [] >> patch_cmake.py
+echo for p in ["*smumps*.lib", "*dmumps*.lib", "*cmumps*.lib", "*zmumps*.lib", "*mumps_common*.lib", "*pord*.lib", "*mpiseq*.lib"]: >> patch_cmake.py
+echo     matches = glob.glob(os.path.join(lib_dir, p)) >> patch_cmake.py
+echo     if matches: libs.append(matches[0].replace(chr(92), chr(47))) >> patch_cmake.py
+echo text = io.open("CMakeLists.txt", encoding="utf-8").read() >> patch_cmake.py
+echo text = text.replace("set(MUMPS_LIBS " + chr(34) + chr(34) + ")", "set(MUMPS_LIBS " + chr(34) + ";".join(libs) + chr(34) + ")") >> patch_cmake.py
+echo text = text.replace("find_package(BLAS REQUIRED)", "set(BLAS_FOUND TRUE)\nset(BLAS_LIBRARIES " + chr(34) + ob_path + chr(34) + ")") >> patch_cmake.py
+echo text = text.replace("find_package(LAPACK REQUIRED)", "set(LAPACK_FOUND TRUE)\nset(LAPACK_LIBRARIES " + chr(34) + ob_path + chr(34) + ")") >> patch_cmake.py
+echo io.open("CMakeLists.txt", "w", encoding="utf-8").write(text) >> patch_cmake.py
+python patch_cmake.py
 
 FOR /F "delims=" %%i IN ('python -c "import numpy; print(numpy.get_include())"') DO set "NUMPY_INC=%%i"
 
@@ -31,8 +33,7 @@ cmake -B build ^
   -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON ^
   -DMUMPS_INC_DIR="%LIBRARY_INC%" ^
   -DPython3_EXECUTABLE="%PYTHON%" ^
-  -DPython3_NumPy_INCLUDE_DIRS="%NUMPY_INC%" ^
-  -DBLA_VENDOR=OpenBLAS
+  -DPython3_NumPy_INCLUDE_DIRS="%NUMPY_INC%"
 
 if errorlevel 1 exit 1
 
