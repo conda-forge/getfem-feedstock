@@ -24,6 +24,10 @@ set "NUMPY_INC=%NUMPY_INC:\=/%"
 
 echo "Building GetFEM with CMake..."
 
+:: Silence MSVC's strict CRT deprecation warnings, required by GetFEM
+set "CFLAGS=%CFLAGS% -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE"
+set "CXXFLAGS=%CXXFLAGS% -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE"
+
 cmake -B build ^
   -G Ninja ^
   %CMAKE_ARGS% ^
