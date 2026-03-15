@@ -1,6 +1,16 @@
 @echo off
 setlocal EnableDelayedExpansion
 
+:: Silence MSVC's strict CRT deprecation warnings, required by GetFEM
+set "CFLAGS=%CFLAGS% -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE"
+set "CXXFLAGS=%CXXFLAGS% -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE"
+
+:: Fix MSVC missing 'not', 'and', 'or' keywords via forced include
+set "CXXFLAGS=%CXXFLAGS% -FIiso646.h"
+
+:: Silence massive C4190 warnings regarding std::complex C-linkage
+set "CXXFLAGS=%CXXFLAGS% -wd4190"
+
 echo "Dynamically finding MUMPS libraries and patching CMakeLists.txt..."
 echo import io, os, glob > patch_cmake.py
 echo lib_dir = os.environ.get("LIBRARY_LIB", "").replace(chr(92), chr(47)) >> patch_cmake.py
@@ -23,10 +33,6 @@ FOR /F "delims=" %%i IN ('python -c "import numpy; print(numpy.get_include())"')
 set "NUMPY_INC=%NUMPY_INC:\=/%"
 
 echo "Building GetFEM with CMake..."
-
-:: Silence MSVC's strict CRT deprecation warnings, required by GetFEM
-set "CFLAGS=%CFLAGS% -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE"
-set "CXXFLAGS=%CXXFLAGS% -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE"
 
 cmake -B build ^
   -G Ninja ^
