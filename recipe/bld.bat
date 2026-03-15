@@ -12,25 +12,37 @@ set "CXXFLAGS=%CXXFLAGS% -FIiso646.h"
 set "CXXFLAGS=%CXXFLAGS% -wd4190"
 
 echo "Dynamically finding MUMPS libraries and patching CMakeLists.txt..."
-echo import io, os, glob > patch_cmake.py
-echo lib_dir = os.environ.get("LIBRARY_LIB", "").replace(chr(92), chr(47)) >> patch_cmake.py
-echo ob_path = os.path.join(lib_dir, "openblas.lib").replace(chr(92), chr(47)) >> patch_cmake.py
-echo libs = [] >> patch_cmake.py
-echo for p in ["*smumps*.lib", "*dmumps*.lib", "*cmumps*.lib", "*zmumps*.lib", "*mumps_common*.lib", "*pord*.lib", "*mpiseq*.lib"]: >> patch_cmake.py
-echo     matches = glob.glob(os.path.join(lib_dir, p)) >> patch_cmake.py
-echo     if matches: libs.append(matches[0].replace(chr(92), chr(47))) >> patch_cmake.py
-echo text = io.open("CMakeLists.txt", encoding="utf-8").read() >> patch_cmake.py
-echo text = text.replace("set(MUMPS_LIBS " + chr(34) + chr(34) + ")", "set(MUMPS_LIBS " + chr(34) + ";".join(libs) + chr(34) + ")") >> patch_cmake.py
-:: Fixes the syntax warnings by keeping these strictly on one line
-echo text = text.replace("find_package(BLAS REQUIRED)", "set(BLAS_FOUND TRUE)\nset(BLAS_LIBRARIES " + chr(34) + ob_path + chr(34) + ")") >> patch_cmake.py
-echo text = text.replace("find_package(LAPACK REQUIRED)", "set(LAPACK_FOUND TRUE)\nset(LAPACK_LIBRARIES " + chr(34) + ob_path + chr(34) + ")") >> patch_cmake.py
-echo io.open("CMakeLists.txt", "w", encoding="utf-8").write(text) >> patch_cmake.py
+(
+echo import os, io, glob
+echo lib_dir = os.environ.get("LIBRARY_LIB", "").replace("\\", "/")
+echo ob_path = os.path.join(lib_dir, "openblas.lib").replace("\\", "/")
+echo libs = []
+echo for p in ["*smumps*.lib", "*dmumps*.lib", "*cmumps*.lib", "*zmumps*.lib", "*mumps_common*.lib", "*pord*.lib", "*mpiseq*.lib"]:
+echo     matches = glob.glob(os.path.join(lib_dir, p))
+echo     if matches: libs.append(matches[0].replace("\\", "/"))
+echo mumps_libs_str = ";".join(libs)
+echo with io.open("CMakeLists.txt", "r", encoding="utf-8") as f:
+echo     text = f.read()
+echo # Fix MUMPS discovery
+echo text = text.replace('set(MUMPS_LIBS "")', f'set(MUMPS_LIBS "{mumps_libs_str}")')
+echo # Fix BLAS/LAPACK to use OpenBLAS directly and avoid find_package calls
+echo blas_fix = f'set(BLAS_FOUND TRUE)\nset(BLAS_LIBRARIES "{ob_path}")'
+echo lapack_fix = f'set(LAPACK_FOUND TRUE)\nset(LAPACK_LIBRARIES "{ob_path}")'
+echo text = text.replace("find_package(BLAS REQUIRED)", blas_fix)
+echo text = text.replace("find_package(LAPACK REQUIRED)", lapack_fix)
+echo with io.open("CMakeLists.txt", "w", encoding="utf-8") as f:
+echo     f.write(text)
+) > patch_cmake.py
 
 python patch_cmake.py
 if errorlevel 1 exit 1
 
+:: Get Numpy Include path and format it
 FOR /F "delims=" %%i IN ('python -c "import numpy; print(numpy.get_include())"') DO set "NUMPY_INC=%%i"
 set "NUMPY_INC=%NUMPY_INC:\=/%"
+
+:: Get Conda's Site-Packages directory and format it
+set "SP_DIR_FWD=%SP_DIR:\=/%"
 
 echo "Building GetFEM with CMake..."
 
@@ -47,12 +59,13 @@ cmake -B build ^
   -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON ^
   -DMUMPS_INC_DIR="%LIBRARY_INC%" ^
   -DPython3_EXECUTABLE="%PYTHON%" ^
-  -DPython3_NumPy_INCLUDE_DIRS="%NUMPY_INC%"
+  -DPython3_NumPy_INCLUDE_DIRS="%NUMPY_INC%" ^
+  -DPYTHON_SITE_PACKAGES="%SP_DIR_FWD%"
 
 if errorlevel 1 exit 1
 
-cmake --build build
+cmake --build build --config Release
 if errorlevel 1 exit 1
 
-cmake --install build
+cmake --install build --config Release
 if errorlevel 1 exit 1
