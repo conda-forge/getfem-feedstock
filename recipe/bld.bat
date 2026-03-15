@@ -68,3 +68,9 @@ if errorlevel 1 exit 1
 
 cmake --install build --config Release
 if errorlevel 1 exit 1
+
+:: Move the Python package from the Library prefix to the actual Conda site-packages directory
+echo "Moving Python package to %SP_DIR%..."
+if not exist "%SP_DIR%" mkdir "%SP_DIR%"
+move /Y "%LIBRARY_PREFIX%\Lib\site-packages\getfem" "%SP_DIR%\"
+if errorlevel 1 exit 1
