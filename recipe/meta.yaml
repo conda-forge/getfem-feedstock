@@ -11,7 +11,6 @@ source:
 
 build:
   number: 0
-  skip: true  # [py>=311 or (python_impl == 'pypy')]
 
 requirements:
   build:
