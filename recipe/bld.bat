@@ -4,6 +4,9 @@ setlocal EnableDelayedExpansion
 echo "Building GetFEM with CMake..."
 FOR /F "delims=" %%i IN ('python -c "import numpy; print(numpy.get_include())"') DO set "NUMPY_INC=%%i"
 
+:: Define the explicit list of MUMPS libraries required by Conda-Forge
+set "MUMPS_LIBS=%LIBRARY_LIB%\smumps_seq.lib;%LIBRARY_LIB%\dmumps_seq.lib;%LIBRARY_LIB%\cmumps_seq.lib;%LIBRARY_LIB%\zmumps_seq.lib;%LIBRARY_LIB%\mumps_common_seq.lib;%LIBRARY_LIB%\pord_seq.lib;%LIBRARY_LIB%\mpiseq_seq.lib"
+
 cmake -B build ^
   -G Ninja ^
   %CMAKE_ARGS% ^
@@ -16,7 +19,7 @@ cmake -B build ^
   -DENABLE_MULTITHREADED_BLAS=ON ^
   -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON ^
   -DMUMPS_INC_DIR="%LIBRARY_INC%" ^
-  -DMUMPS_LIB_DIR="%LIBRARY_LIB%" ^
+  -DMUMPS_LIBS="%MUMPS_LIBS%" ^
   -DPython3_EXECUTABLE="%PYTHON%" ^
   -DPython3_NumPy_INCLUDE_DIRS="%NUMPY_INC%" ^
   -DBLAS_LIBRARIES="%LIBRARY_LIB%\openblas.lib" ^
