@@ -7,7 +7,7 @@ Home: https://getfem.org/
 
 Package license: LGPL-3.0-or-later AND BSD-3-Clause
 
-Summary: GetFEM++ is a generic finite element C++ library with interfaces for Python, Matlab and Scilab.
+Summary: GetFEM is a generic finite element C++ library with interfaces for Python, Matlab/Octave and Scilab.
 
 Development: https://github.com/getfem-doc/getfem
 
