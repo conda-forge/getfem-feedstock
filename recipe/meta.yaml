@@ -1,5 +1,5 @@
 {% set name = "getfem" %}
-{% set version = "5.4.4" %}
+{% set version = "5.5" %}
 
 package:
   name: {{ name }}
@@ -7,10 +7,10 @@ package:
 
 source:
   url: https://github.com/{{ name }}/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: d552106065afa15146efb5eb179cf0c69b17b170ce153444599d5cccf618f17c
+  sha256: 93ddb4c16c59a7a88ba95d036d4a91f8295309c677b71926ded107f9c58ffe32
 
 build:
-  number: 1
+  number: 0
 
 requirements:
   build:
